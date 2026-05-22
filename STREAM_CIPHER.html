@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stream Cipher | Plataforma de Accesos Élite</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Urbanist:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        :root {
+            --neon-blue: #00f3ff;
+            --dark-bg: #05070c;
+            --card-bg: rgba(13, 18, 30, 0.75);
+            --accent-purple: #a855f7;
+            --text-gray: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #ffffff;
+            font-family: 'Urbanist', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* LIENZO ANIMADO DE CIRCUITOS (CANVAS) */
+        #circuitBg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* HEADER / PERFIL */
+        header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .logo-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .main-logo {
+            width: 110px;
+            height: 110px;
+            object-fit: contain;
+            border-radius: 24px;
+            border: 2px solid var(--neon-blue);
+            padding: 6px;
+            background: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.25);
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 26px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        h1 span {
+            color: var(--neon-blue);
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+        }
+
+        .ceo-tag {
+            font-size: 13px;
+            color: var(--text-gray);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        /* SECCIÓN CATÁLOGO DE PRODUCTOS */
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            color: var(--neon-blue);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin: 35px 0 15px 5px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::after {
+            content: '';
+            flex-grow: 1;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(0,243,255,0.3), transparent);
+        }
+
+        .products-grid {
+            display: grid;
+            gap: 18px;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 22px;
+            padding: 20px;
+            backdrop-filter: blur(12px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card:hover {
+            border-color: var(--neon-blue);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(0, 243, 255, 0.08);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .card-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-brand i {
+            font-size: 22px;
+            color: var(--neon-blue);
+        }
+
+        .card-title {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .price-tag {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        .features-list {
+            list-style: none;
+            margin-bottom: 18px;
+            text-align: left;
+        }
+
+        .features-list li {
+            font-size: 13px;
+            color: var(--text-gray);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .features-list li i {
+            color: #22c55e;
+            font-size: 11px;
+        }
+
+        .btn-order {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover .btn-order {
+            background: rgba(0, 243, 255, 0.1);
+            color: var(--neon-blue);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+        }
+
+        /* ESTILO ESPECIAL PARA LA TARJETA DE SOFTWARE EXTRA */
+        .software-card {
+            border-color: rgba(168, 85, 247, 0.3);
+            background: rgba(168, 85, 247, 0.03);
+            margin-top: 18px;
+        }
+
+        .software-card:hover {
+            border-color: var(--accent-purple);
+            box-shadow: 0 12px 25px rgba(168, 85, 247, 0.15);
+        }
+
+        .software-card .card-brand i {
+            color: var(--accent-purple);
+        }
+
+        .software-card .btn-order:hover {
+            background: rgba(168, 85, 247, 0.1);
+            color: var(--accent-purple);
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+        }
+
+        /* BENEFICIOS / SEGURIDAD */
+        .specs-panel {
+            background: rgba(168, 85, 247, 0.04);
+            border: 1px solid rgba(168, 85, 247, 0.15);
+            border-radius: 22px;
+            padding: 20px;
+            margin-top: 15px;
+            backdrop-filter: blur(12px);
+        }
+
+        .spec-item {
+            display: flex;
+            gap: 15px;
+            align-items: start;
+            text-align: left;
+            margin-bottom: 15px;
+        }
+
+        .spec-item:last-child { margin-bottom: 0; }
+
+        .spec-icon {
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid var(--accent-purple);
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-purple);
+            flex-shrink: 0;
+        }
+
+        .spec-text h4 { font-size: 14px; color: #fff; margin-bottom: 2px;}
+        .spec-text p { font-size: 12px; color: var(--text-gray); }
+
+        /* SECCIÓN ACORDIONES (FAQ) */
+        .faq-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+        }
+
+        .faq-trigger {
+            width: 100%;
+            padding: 16px;
+            background: none;
+            border: none;
+            color: #fff;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .faq-content {
+            padding: 0 16px;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            color: var(--text-gray);
+            font-size: 13px;
+            text-align: left;
+        }
+
+        .faq-item:focus-within .faq-content {
+            padding: 0 16px 16px 16px;
+            max-height: 100px;
+        }
+        .faq-item:focus-within .faq-trigger i {
+            transform: rotate(180deg);
+            color: var(--neon-blue);
+        }
+
+        footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 11px;
+            color: #475569;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="circuitBg"></canvas>
+
+    <div class="container">
+        
+        <header>
+            <div class="logo-wrapper">
+                <img src="LOGO(1).png" alt="Stream Cipher Logo" class="main-logo">
+            </div>
+            <h1>Stream <span>Cipher</span></h1>
+            <div class="ceo-tag">José Salinas — CEO</div>
+        </header>
+
+        <div class="section-title">Catálogo Cifrado</div>
+        <div class="products-grid">
+            
+            <div class="product-card">
+                <div class="card-header">
+                    <div class="card-brand">
+                        <i class="fa-solid fa-tv"></i>
+                        <span class="card-title">Netflix Premium</span>
+                    </div>
+                    <div class="price-tag">Élite</div>
+                </div>
+                <ul class="features-list">
+                    <li><i class="fa-solid fa-circle-check"></i> Calidad Ultra HD 4K Original</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Perfil Privado con PIN de Control</li>
+                </ul>
+                <a href="https://wa.me/593999299621?text=Hola%20José,%20deseo%20adquirir%20el%20acceso%20para%20Netflix%20Premium%204K." target="_blank" class="btn-order">
+                    Solicitar Acceso <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <div class="product-card">
+                <div class="card-header">
+                    <div class="card-brand">
+                        <i class="fa-solid fa-clapperboard"></i>
+                        <span class="card-title">Disney+ Premium</span>
+                    </div>
+                    <div class="price-tag">Élite</div>
+                </div>
+                <ul class="features-list">
+                    <li><i class="fa-solid fa-circle-check"></i> Catálogo Completo + ESPN En Vivo</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Audio Dolby Atmos de Alta Fidelidad</li>
+                </ul>
+                <a href="https://wa.me/593999299621?text=Hola%20José,%20deseo%20adquirir%20el%20acceso%20para%20Disney%2B." target="_blank" class="btn-order">
+                    Solicitar Acceso <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <div class="product-card">
+                <div class="card-header">
+                    <div class="card-brand">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span class="card-title">Max (HBO)</span>
+                    </div>
+                    <div class="price-tag">Élite</div>
+                </div>
+                <ul class="features-list">
+                    <li><i class="fa-solid fa-circle-check"></i> Warner Bros, DC, y Max Originals</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Transmisión simultánea sin caídas</li>
+                </ul>
+                <a href="https://wa.me/593999299621?text=Hola%20José,%20deseo%20adquirir%20el%20acceso%20para%20Max%20(HBO)." target="_blank" class="btn-order">
+                    Solicitar Acceso <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <div class="product-card">
+                <div class="card-header">
+                    <div class="card-brand">
+                        <i class="fa-solid fa-music"></i>
+                        <span class="card-title">Spotify Premium</span>
+                    </div>
+                    <div class="price-tag">Élite</div>
+                </div>
+                <ul class="features-list">
+                    <li><i class="fa-solid fa-circle-check"></i> Audio Hi-Res sin anuncios</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Descarga de música sin conexión</li>
+                </ul>
+                <a href="https://wa.me/593999299621?text=Hola%20José,%20deseo%20adquirir%20el%20acceso%20para%20Spotify%20Premium." target="_blank" class="btn-order">
+                    Solicitar Acceso <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+
+        </div>
+
+        <div class="product-card software-card">
+            <div class="card-header" style="justify-content: center; margin-bottom: 8px;">
+                <div class="card-brand">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span class="card-title">Más Apps & Licencias Élite</span>
+                </div>
+            </div>
+            <p style="text-align: center; font-size: 13px; color: var(--text-gray); margin-bottom: 18px; line-height: 1.5;">
+                También garantizamos tu productividad y creatividad. Contamos con licencias oficiales para <strong>Microsoft Office, Windows, Adobe Creative Cloud, Canva Edu, Crunchyroll</strong> y mucho más.
+            </p>
+            <a href="https://wa.me/593999299621?text=Hola%20José,%20deseo%20consultar%20el%20catálogo%20completo%20de%20otras%20plataformas%20y%20licencias%20de%20software%20(Canva,%20Office,%20Adobe,%20etc)." target="_blank" class="btn-order" style="border-color: rgba(168, 85, 247, 0.3);">
+                Consultar Disponibilidad <i class="fa-brands fa-whatsapp" style="font-size: 16px;"></i>
+            </a>
+        </div>
+
+        <div class="section-title">Protocolo de Garantía</div>
+        <div class="specs-panel">
+            <div class="spec-item">
+                <div class="spec-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                <div class="spec-text">
+                    <h4>Accesos 100% Originales</h4>
+                    <p>No usamos métodos caídos. Filtramos los accesos para ofrecer máxima estabilidad tanto en streaming como en software corporativo.</p>
+                </div>
+            </div>
+            <div class="spec-item">
+                <div class="spec-icon"><i class="fa-solid fa-headset"></i></div>
+                <div class="spec-text">
+                    <h4>Soporte Técnico Directo</h4>
+                    <p>Soporte personalizado gestionado directamente por mí para resolver cualquier inconveniente rápidamente.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title">Preguntas Frecuentes</div>
+        <div class="faq-wrapper">
+            
+            <div class="faq-item" tabindex="1">
+                <button class="faq-trigger">
+                    <span>¿Cómo recibo mi cuenta o licencia?</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <div class="faq-content">
+                    Una vez verificado el pago, te entrego las credenciales (correo y contraseña) o la clave de producto junto con las instrucciones de seguridad directamente por WhatsApp.
+                </div>
+            </div>
+
+            <div class="faq-item" tabindex="2">
+                <button class="faq-trigger">
+                    <span>¿Las cuentas tienen garantía?</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <div class="faq-content">
+                    Sí, absolutamente todas las cuentas de streaming y licencias de software de Stream Cipher cuentan con garantía completa durante el tiempo contratado.
+                </div>
+            </div>
+
+        </div>
+
+        <footer>
+            &copy; 2026 Stream Cipher | Infosec, Entertainment & Software.
+        </footer>
+
+    </div>
+
+    <script>
+        const canvas = document.getElementById('circuitBg');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particlesArray = [];
+
+        // Crea los nodos de conexión
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = (Math.random() * 1 - 0.5) * 0.8;
+                this.speedY = (Math.random() * 1 - 0.5) * 0.8;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x > canvas.width || this.x < 0) this.speedX = -this.speedX;
+                if (this.y > canvas.height || this.y < 0) this.speedY = -this.speedY;
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(0, 243, 255, 0.8)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function init() {
+            particlesArray = [];
+            for (let i = 0; i < 70; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+
+        function connect() {
+            let opacityValue = 1;
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x))
+                                 + ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+                    
+                    if (distance < (canvas.width/8) * (canvas.height/8)) {
+                        opacityValue = 1 - (distance / 20000);
+                        ctx.strokeStyle = 'rgba(0, 243, 255,' + opacityValue + ')';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            connect();
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            init();
+        });
+
+        init();
+        animate();
+    </script>
+</body>
+</html>
